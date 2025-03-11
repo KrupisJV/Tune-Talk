@@ -12,7 +12,7 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8887/Login.php', {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE}/Login.php`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

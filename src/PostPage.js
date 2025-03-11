@@ -24,7 +24,7 @@ function PostPage() {
 
     const fetchPosts = async () => {
         try {
-            const response = await fetch('http://localhost:8887/post.php');
+            const response = await fetch(`${process.env.REACT_APP_API_BASE}/post.php`);
             if (!response.ok) {
                 throw new Error('Failed to fetch posts');
             }
@@ -32,7 +32,7 @@ function PostPage() {
             
             const updatedPosts = data.map(post => ({
                 ...post,
-                image: post.image ? `http://localhost:8887/uploads/${post.image}` : "/placeholder.svg"
+                image: post.image ? `${process.env.REACT_APP_API_BASE}/uploads/${post.image}` : "/placeholder.svg"
             }));
             
             setPosts(updatedPosts);

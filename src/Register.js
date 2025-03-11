@@ -13,7 +13,7 @@ function Register() {
         e.preventDefault();
 
         try {
-            const response = await axios.post('http://localhost:8887/Register.php', {
+            const response = await axios.post(`${process.env.REACT_APP_API_BASE}/Register.php`, {
                 username,
                 email,
                 password
@@ -31,7 +31,6 @@ function Register() {
     return (
         <div className="register-page">
             <div className="register-container">
-                {/* <img src={logo} alt="Tune Talk Logo" className="logo" /> */}
                 <h2>Register</h2>
                 <form className="register-form" onSubmit={handleSubmit}>
                     <div className="form-group">

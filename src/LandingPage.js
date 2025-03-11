@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from "react"
 
-
 function LandingPage() {
   const [posts, setPosts] = useState([])
   const [selectedPost, setSelectedPost] = useState(null)
@@ -14,7 +13,7 @@ function LandingPage() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await fetch("http://localhost:8887/post.php")
+        const response = await fetch(`${process.env.REACT_APP_API_BASE}/post.php`)
         if (!response.ok) {
           throw new Error("Failed to fetch posts")
         }
