@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Upload, Loader2, ArrowLeft } from 'lucide-react';
 
 function PostPage() {
     const [title, setTitle] = useState('');
@@ -9,9 +10,8 @@ function PostPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-    const [posts, setPosts] = useState([]);
 
-    const navigate = useNavigate(); // Import navigation hook
+    const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
 
     useEffect(() => {
@@ -21,29 +21,6 @@ function PostPage() {
             setError("User not found in local storage.");
         }
     }, [user]);
-
-    const fetchPosts = async () => {
-        try {
-            const response = await fetch(`${process.env.REACT_APP_API_BASE}/post.php`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch posts');
-            }
-            const data = await response.json();
-            
-            const updatedPosts = data.map(post => ({
-                ...post,
-                image: post.image ? `${process.env.REACT_APP_API_BASE}/uploads/${post.image}` : "/placeholder.svg"
-            }));
-            
-            setPosts(updatedPosts);
-        } catch (error) {
-            setError("An error occurred while fetching posts: " + error.message);
-        }
-    };
-
-    useEffect(() => {
-        fetchPosts();
-    }, []);
 
     const validateForm = () => {
         if (!title.trim() || !content.trim() || !author.trim()) {
@@ -57,9 +34,7 @@ function PostPage() {
         event.preventDefault();
         setError('');
         setSuccessMessage('');
-
         if (!validateForm()) return;
-
         setIsLoading(true);
 
         const formData = new FormData();
@@ -79,7 +54,7 @@ function PostPage() {
 
             if (response.ok) {
                 setSuccessMessage(data.success || "Post created successfully.");
-                navigate('/'); // Redirect to landing page
+                setTimeout(() => navigate('/'), 1500);
             } else {
                 setError(data.error || "Failed to create post.");
             }
@@ -94,38 +69,66 @@ function PostPage() {
     };
 
     return (
-        <div className="bg-black min-h-screen text-white px-8 py-4">
-            <h2 className="text-4xl font-bold mb-6">Create a New Post</h2>
-            {error && <div className="bg-red-600 text-white p-3 rounded mb-4">{error}</div>}
-            {successMessage && <div className="bg-green-600 text-white p-3 rounded mb-4">{successMessage}</div>}
-            <form onSubmit={handleSubmit} className="bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg mx-auto">
-                <input
-                    type="text"
-                    placeholder="Title"
-                    className="w-full p-3 bg-gray-700 text-white rounded mb-3"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                />
-                <textarea
-                    placeholder="Content"
-                    className="w-full p-3 bg-gray-700 text-white rounded mb-3"
-                    rows="5"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    required
-                ></textarea>
-                <input
-                    type="file"
-                    accept="image/*"
-                    className="w-full bg-gray-700 text-white p-3 rounded mb-3"
-                    onChange={(e) => setImage(e.target.files[0])}
-                    required
-                />
-                <button type="submit" className="w-full bg-red-600 p-3 rounded font-bold hover:bg-red-700" disabled={isLoading}>
-                    {isLoading ? 'Creating post...' : 'Create Post'}
-                </button>
-            </form>
+        <div className="relative flex flex-col items-center justify-center min-h-screen px-6 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-red-800 to-black animate-gradient-move"></div>
+            <div className="relative w-full max-w-2xl p-8 bg-gray-800 rounded-2xl shadow-xl border border-gray-700">
+                <div className="flex items-center justify-center mb-6">
+                    <button onClick={() => navigate('/')} className="text-white hover:text-gray-400 transition">
+                        <ArrowLeft size={24} />
+                    </button>
+                    <h2 className="text-3xl font-bold text-white text-center flex-1">Create a New Post</h2>
+                </div>
+                {error && <div className="bg-red-500 text-white p-3 rounded-lg text-center mb-4">{error}</div>}
+                {successMessage && <div className="bg-green-500 text-white p-3 rounded-lg text-center mb-4">{successMessage}</div>}
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <input
+                        type="text"
+                        placeholder="Title"
+                        className="w-full p-3 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                    />
+                    <textarea
+                        placeholder="Content"
+                        className="w-full p-3 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500"
+                        rows="5"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        required
+                    ></textarea>
+                    <label className="flex items-center justify-center gap-2 w-full bg-gray-700 text-white p-3 rounded-lg cursor-pointer hover:bg-gray-600 transition">
+                        <Upload size={20} /> Upload Image
+                        <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => setImage(e.target.files[0])}
+                            required
+                        />
+                    </label>
+                    <button
+                        type="submit"
+                        className="w-full bg-red-600 hover:bg-red-700 transition p-3 rounded-xl text-lg font-semibold flex items-center justify-center gap-2"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? <Loader2 className="animate-spin" size={20} /> : 'Create Post'}
+                    </button>
+                </form>
+            </div>
+            <style>
+                {`
+                    @keyframes gradientMove {
+                        0% { background-position: 0% 50%; }
+                        50% { background-position: 100% 50%; }
+                        100% { background-position: 0% 50%; }
+                    }
+                    .animate-gradient-move {
+                        background-size: 200% 200%;
+                        animation: gradientMove 5s infinite alternate ease-in-out;
+                    }
+                `}
+            </style>
         </div>
     );
 }

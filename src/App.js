@@ -24,7 +24,8 @@ function App() {
                         <Route path="/register" element={<Register />} />
                         <Route path="/posts" element={<PostPage />} />
                         <Route path="/post/:id" element={<PostDetail />} />
-                        <Route path="/recommended playlists" element={<RecommendedPlaylists />} />
+                        <Route path="/recommended-playlists" element={<RecommendedPlaylists />} />
+
                         <Route path="/profile" element={<Profile />} />
                     </Routes>
                 </main>

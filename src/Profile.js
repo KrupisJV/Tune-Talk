@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Profile = () => {
     const [user, setUser] = useState(null);
@@ -15,7 +16,7 @@ const Profile = () => {
         const fetchProfileFromStorage = () => {
             const user = JSON.parse(localStorage.getItem("user"));
             const posts = JSON.parse(localStorage.getItem("posts")) || [];
-            
+
             if (user) {
                 setUser(user);
                 setImagePreview(user.profilePicture);
@@ -61,33 +62,34 @@ const Profile = () => {
 
     if (loading) return <div className="text-white text-center mt-10">Loading...</div>;
 
-    if (!user) return <div className="text-white text-center mt-10">No profile data available.</div>;
-
     return (
-        <div className="flex flex-col items-center min-h-screen bg-black text-white">
-            <header className="flex justify-center items-center">
-                <nav className="flex gap-6">
-                    <a href="/" className="text-white/80 hover:text-white transition">Home</a>
-                    <a href="/posts" className="text-white/80 hover:text-white transition">Posts</a>
-                    <a href="/recommended-playlists" className="text-white/80 hover:text-white transition">Recommended</a>
-                </nav>
-                <div className="flex gap-4">
-                    <button onClick={() => setEditMode(true)} className="bg-gray-600 px-4 py-2 rounded hover:bg-gray-700 transition">
-                        Edit Profile
-                    </button>
-                    <button className="bg-red-600 px-4 py-2 rounded hover:bg-red-700 transition" onClick={handleLogout}>
-                        Logout
-                    </button>
-                </div>
-            </header>
-
-            <main className="mt-20 w-full max-w-md text-center p-6">
-                <div className="flex flex-col items-center">
-                    <div className="relative">
-                        <img
+        <motion.div
+            className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white flex justify-center items-start py-12 px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+        >
+            <motion.div
+                className="w-full max-w-5xl bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-8 flex flex-col md:flex-row gap-8"
+                initial={{ scale: 0.95, y: 30 }}
+                animate={{ scale: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+                {/* Sidebar */}
+                <motion.div
+                    className="w-full md:w-1/3 flex flex-col items-center text-center"
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                >
+                    <motion.div className="relative group" whileHover={{ scale: 1.05 }}>
+                        <motion.img
                             src={imagePreview || user.profilePicture || "/default-avatar.png"}
                             alt={user.username}
-                            className="w-32 h-32 rounded-full border-4 border-red-600"
+                            className="w-36 h-36 md:w-44 md:h-44 rounded-full border-4 border-red-500 object-cover shadow-lg"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", stiffness: 120 }}
                         />
                         <input
                             type="file"
@@ -98,70 +100,116 @@ const Profile = () => {
                         />
                         <label
                             htmlFor="profile-picture-upload"
-                            className="bg-red-600 px-3 py-1 rounded cursor-pointer hover:bg-red-700 transition mt-2 inline-block"
+                            className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-red-600 hover:bg-red-700 text-xs font-medium px-3 py-1 rounded-full shadow-md cursor-pointer transition"
                         >
-                            Change Picture
+                            Change
                         </label>
+                    </motion.div>
+                    <h1 className="mt-5 text-2xl font-bold">{user.username}</h1>
+                    <p className="mt-2 text-sm text-gray-300">{user.bio || "No bio available."}</p>
+                    <div className="flex flex-col gap-2 mt-5 w-full">
+                        <button
+                            onClick={() => setEditMode(true)}
+                            className="bg-red-600 hover:bg-red-700 text-sm font-medium py-2 rounded-full transition shadow-md"
+                        >
+                            Edit Profile
+                        </button>
+                        <button
+                            onClick={handleLogout}
+                            className="bg-gray-700 hover:bg-gray-600 text-sm font-medium py-2 rounded-full transition shadow-md"
+                        >
+                            Logout
+                        </button>
                     </div>
-                    <h1 className="mt-4 text-xl font-bold">{user.username}</h1>
-                    <p className="mt-2 text-gray-400">{user.bio || "No bio available."}</p>
-                </div>
+                </motion.div>
 
-                <section className="bg-gray-900 p-4 mt-6 rounded-lg shadow-lg">
-                    <h2 className="text-lg font-semibold text-red-600">Your Posts</h2>
-                    {userPosts.length > 0 ? (
-                        <ul className="mt-3 space-y-2">
-                            {userPosts.map((post, index) => (
-                                <li key={index} className="bg-gray-800 p-3 rounded">
+                {/* Profile Content */}
+                <div className="w-full md:w-2/3">
+                    <h2 className="text-2xl font-semibold text-red-400 mb-4 border-b border-white/10 pb-2">
+                        Your Posts
+                    </h2>
+
+                    <motion.ul
+                        className="space-y-4"
+                        initial="hidden"
+                        animate="visible"
+                        variants={{
+                            visible: {
+                                transition: {
+                                    staggerChildren: 0.1
+                                }
+                            }
+                        }}
+                    >
+                        {userPosts.length > 0 ? (
+                            userPosts.map((post, index) => (
+                                <motion.li
+                                    key={index}
+                                    className="bg-gray-800 p-4 rounded-lg shadow-md"
+                                    variants={{
+                                        hidden: { opacity: 0, y: 20 },
+                                        visible: { opacity: 1, y: 0 }
+                                    }}
+                                    transition={{ duration: 0.4 }}
+                                    whileHover={{ scale: 1.02 }}
+                                >
                                     <p className="text-white">{post.content}</p>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p className="text-gray-400 mt-2">No posts available.</p>
-                    )}
-                </section>
+                                </motion.li>
+                            ))
+                        ) : (
+                            <p className="text-gray-400">You haven't posted anything yet.</p>
+                        )}
+                    </motion.ul>
 
-                <section className="bg-gray-900 p-4 mt-6 rounded-lg shadow-lg">
-                    <h2 className="text-lg font-semibold text-red-600">Details</h2>
-                    {editMode ? (
-                        <form onSubmit={handleSaveChanges} className="flex flex-col gap-3">
-                            <label className="text-left">
-                                <span className="text-gray-400">Bio:</span>
-                                <textarea
-                                    value={newBio}
-                                    onChange={(e) => setNewBio(e.target.value)}
-                                    className="w-full p-2 rounded bg-gray-800 text-white mt-1"
-                                />
-                            </label>
-                            <label className="text-left">
-                                <span className="text-gray-400">Caption:</span>
-                                <textarea
-                                    value={newCaption}
-                                    onChange={(e) => setNewCaption(e.target.value)}
-                                    className="w-full p-2 rounded bg-gray-800 text-white mt-1"
-                                />
-                            </label>
-                            <button type="submit" className="bg-red-600 px-4 py-2 rounded hover:bg-red-700 transition">
-                                Save Changes
-                            </button>
-                            <button type="button" onClick={() => setEditMode(false)} className="text-gray-400 mt-2">
-                                Cancel
-                            </button>
-                        </form>
-                    ) : (
-                        <div>
-                            <p className="text-gray-400">
-                                <span className="text-white font-semibold">Bio:</span> {user.bio || "No bio available."}
-                            </p>
-                            <p className="text-gray-400 mt-2">
-                                <span className="text-white font-semibold">Caption:</span> {user.caption || "No caption available."}
-                            </p>
-                        </div>
-                    )}
-                </section>
-            </main>
-        </div>
+                    {/* Edit Profile Section */}
+                    <AnimatePresence>
+                        {editMode && (
+                            <motion.form
+                                onSubmit={handleSaveChanges}
+                                className="mt-8 bg-gray-800 p-6 rounded-xl shadow-lg space-y-6"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 20 }}
+                                transition={{ duration: 0.4 }}
+                            >
+                                <h3 className="text-xl font-semibold text-red-400">Edit Your Profile</h3>
+                                <div>
+                                    <label className="block text-sm text-gray-300 mb-1">Bio</label>
+                                    <textarea
+                                        value={newBio}
+                                        onChange={(e) => setNewBio(e.target.value)}
+                                        className="w-full p-3 bg-gray-900 text-white rounded-lg border border-white/10 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm text-gray-300 mb-1">Caption</label>
+                                    <textarea
+                                        value={newCaption}
+                                        onChange={(e) => setNewCaption(e.target.value)}
+                                        className="w-full p-3 bg-gray-900 text-white rounded-lg border border-white/10 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                    />
+                                </div>
+                                <div className="flex gap-3">
+                                    <button
+                                        type="submit"
+                                        className="bg-green-600 hover:bg-green-700 px-5 py-2 rounded-full text-sm font-medium transition"
+                                    >
+                                        Save Changes
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditMode(false)}
+                                        className="text-sm text-gray-400 hover:underline"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </motion.form>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </motion.div>
+        </motion.div>
     );
 };
 

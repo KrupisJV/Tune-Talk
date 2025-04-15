@@ -9,6 +9,7 @@ function LandingPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [menuOpen, setMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  
 
   useEffect(() => {
     const fetchPosts = async () => {
