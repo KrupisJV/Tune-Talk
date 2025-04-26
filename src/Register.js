@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './style/Register.css';
 // import logo from './bildes/TUNETALK.png';
 
 function Register() {

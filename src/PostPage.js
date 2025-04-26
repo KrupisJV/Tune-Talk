@@ -16,14 +16,14 @@ function PostPage() {
 
     useEffect(() => {
         if (user) {
-            setAuthor(user.username);
+            setAuthor(user.user_id);
         } else {
             setError("User not found in local storage.");
         }
     }, [user]);
 
     const validateForm = () => {
-        if (!title.trim() || !content.trim() || !author.trim()) {
+        if (!title.trim() || !content.trim() || !author) {
             setError("Please fill in all fields.");
             return false;
         }
@@ -41,10 +41,10 @@ function PostPage() {
         formData.append('image', image);
         formData.append('title', title);
         formData.append('content', content);
-        formData.append('author', author);
+        formData.append('author_id', author);
 
         try {
-            const response = await fetch('http://localhost:8887/post.php', {
+            const response = await fetch('http://krupis.kantans.com/post.php', {
                 method: 'POST',
                 body: formData,
                 headers: { 'Accept': 'application/json' }
